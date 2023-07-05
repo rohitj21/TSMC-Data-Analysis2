@@ -9,9 +9,7 @@ The repository is organized into the following sections:
 
 **Datasets**: This directory contains the dataset used for the analysis. The monthly revenue data of TSMC is obtained from www.tsmc.com and stored in a structured format. The datasets are in RData and CSV file format.
 
-**Plots**: This directory contains the plots generated during the analysis. The plots include visualizations of the revenue data, model performance evaluation, and forecasted revenue for the next year. These visualizations help in understanding the trends, patterns, and model accuracy.
-
-**Final Report**: This directory contains the final report summarizing the project. The report provides an overview of the project objectives, methodology, data analysis process, evaluation metrics, results, and conclusion. It also highlights the strengths and limitations of each model and offers insights for future research and application.
+**Final Report**: This directory contains the final report and plots summarizing the project. The plots include visualizations of the revenue data, model performance evaluation, and forecasted revenue for the next year. These visualizations help in understanding the trends, patterns, and model accuracy. The report provides an overview of the project objectives, methodology, data analysis process, evaluation metrics, results, and conclusion. It also highlights the strengths and limitations of each model and offers insights for future research and application.
 
 Usage
 To use this project repository, follow the steps below:
@@ -26,9 +24,9 @@ Navigate to the cloned directory:
 bash
 Copy code
 cd project-repo
-Set up the required dependencies and environment (if any) as specified in the code's documentation.
+Set up the required dependencies and environment as specified in the libraries.r file.
 
-Explore the Code directory to understand the data preprocessing, model training, evaluation, and revenue forecasting steps. Execute the code to reproduce the analysis.
+Explore the Code directory to understand the data preprocessing, model training, evaluation, and revenue forecasting steps. Execute the code to reproduce the analysis as specified in the report.
 
 Access the Datasets directory to view and analyze the raw and processed data used for the analysis. Make any necessary modifications to the dataset.
 
