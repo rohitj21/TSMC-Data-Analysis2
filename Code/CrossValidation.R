@@ -1,65 +1,50 @@
-
-#-----------------------------------#
 p<-3
 cutoffs <- seq.default(from = 216, to  = 288-p, by = p)
 logrev <- ts(log10(timeseries$Revenue) , start = 1999, frequency = 12)
-
-arima.pred<-NULL
-for(endpoint in cutoffs){
-  dat <- ts(logrev[1:endpoint],start = 1999, frequency = 12)
-  m <- forecast(Arima(dat,order=c(4,1,1),seasonal=c(1,0,2)),h=p)
-  arima.pred = c(arima.pred, m$mean)
-}
-arima.pred = data.frame("Time" = timeseries$Date[217:288], "Prediction" = arima.pred)
-
+iters <- length(cutoffs)
+sarima.pred<-NULL
 hw.pred <- NULL
-
-for(endpoint in cutoffs){
-    dat <- ts(logrev[1:endpoint],start = 1999, frequency = 12)
-    Zt <- diff(dat)
-    m <- hw(Zt, h = p, seasonal = "additive")
-    Yt <- dat[endpoint] + diffinv(m$mean)[-1]
-    hw.pred = c(hw.pred, Yt)
-}
-hw.pred = data.frame("Time" = timeseries$Date[217:288], "Prediction" = hw.pred)
-
-
-#--------------------------------#
 prophet.pred <- NULL
 for(endpoint in cutoffs){
-    Zt <- diff(logrev)
-    df <- data.frame(ds = seq(as.Date('1999-02-01'), as.Date('2023-04-01'), by = 'm'),y= Zt)
+  print(paste(iters, "iterations left"))
+  # Sarima
+  dat <- ts(logrev[1:endpoint],start = 1999, frequency = 12)
+  m1 <- Arima(dat,order=c(4,1,1),seasonal=c(1,0,2))
+  sarima_forecast <- forecast(m1,h=p)
+  sarima.pred = c(sarima.pred, sarima_forecast$mean)
 
-    m<-prophet(df[1:endpoint,], growth = 'linear',
-               yearly.seasonality = 'auto',
-               weekly.seasonality = F,
-               daily.seasonality = F,
-               seasonality.mode = 'additive',
-    )
-    future <- make_future_dataframe(m, freq='month', periods=12)
-    forecast <- predict(m, future[])[endpoint + (1:p),16]
-    Yt <- logrev[endpoint] + diffinv(forecast)[-1]
-    prophet.pred <- c(prophet.pred, Yt)
+  # Holt Winter
+  Zt <- diff(dat)
+  m2 <- hw(Zt, h = p, seasonal = "additive")
+  hwYt <- dat[endpoint] + diffinv(m2$mean)[-1]
+  hw.pred = c(hw.pred, hwYt)
+
+  # Prophet
+
+  Zt <- diff(logrev)
+  df <- data.frame(ds = seq(as.Date('1999-02-01'), as.Date('2023-04-01'), by = 'm'),y= Zt)
+
+  m3 <-prophet(df[1:(endpoint-1),], growth = 'linear',
+             yearly.seasonality = 'auto',
+             weekly.seasonality = F,
+             daily.seasonality = F,
+             seasonality.mode = 'additive',
+  )
+  future <- make_future_dataframe(m3, freq='month', periods=12)
+  forecast <- predict(m3, future)
+  pYt <- logrev[endpoint] + diffinv(forecast[endpoint-1 + (1:p),16])[-1]
+  prophet.pred <- c(prophet.pred, pYt)
+
+  iters <- iters - 1
 }
-prophet.pred <- data.frame("Time" = timeseries$Date[217:288], "Prediction" = prophet.pred)
 
-
-plot(1:72, logrev[217:288], type = 'l')
-lines(1:72, arima.pred$Prediction, col  = 'red')
-lines(1:72, hw.pred$Prediction, col  = 'blue')
-
-
-#--------------------------------#
-
-pridictions <- data.frame(
-  "Time" = hw.pred$Time,
-  "RealValue" = 10^logrev[216 + (1:72)],
-  "HW" = 10^hw.pred$Prediction,
-  "Prophet" = 10^prophet.pred$Prediction,
-  "ARIMA"= 10^arima.pred$Prediction
+RevenuePridiction <- data.frame(
+  "Time" = timeseries$Date[217:288],
+  "RealValue" = 10^logrev[217:288],
+  "HW" = 10^hw.pred,
+  "Prophet" = 10^prophet.pred,
+  "SARIMA"= 10^sarima.pred
 )
-
-RevenuePridiction <- cbind("Time" = pridictions[,1], (pridictions[,2:5]))
 
 err <- RevenuePridiction[3:5] - RevenuePridiction$RealValue
 
@@ -103,14 +88,25 @@ p2 <- ggplot(CV.dat, aes(x = time, y = Prophet))+
   scale_y_continuous(trans = log10_trans(), breaks = trans_breaks("log10", function(x) 10^x),
                      labels = label_number(accuracy = 1))
 
-p3 <- ggplot(CV.dat, aes(x = time, y = ARIMA))+
+p3 <- ggplot(CV.dat, aes(x = time, y = SARIMA))+
   geom_line(linewidth = 1, col = "darkblue")+theme_light()+
   geom_line(aes(y=RealValue))+
   labs(title = "Sarima Model", x= '', y = '')+
   scale_y_continuous(trans = log10_trans(), breaks = trans_breaks("log10", function(x) 10^x),
                      labels = label_number(accuracy = 1))
 p4 <- grid.arrange(p1,p2,p3,p0, top=textGrob("Cross Validation Model Comparision"))
-ggsave("Plots/CrossValidation.png",plot = p4, height = 720, width = 1080, scale = 2, units = 'px')
+ggsave("Final Report/Plots/CrossValidation.png",plot = p4, height = 720, width = 1080, scale = 2, units = 'px')
 
 
+##---------##
+# This is the code to linearly combine the three models
+#
+# combinedmodel <- lm(formula =
+#                       RealValue~ HW*Prophet*SARIMA ,
+#                     data = RevenuePridiction)
+# summary(combinedmodel)
+# checkresiduals(combinedmodel$residuals)
+# mape(RevenuePridiction$RealValue, combinedmodel$fitted.values)
+# plot(1:72, RevenuePridiction$RealValue, type = "l")
+# lines(1:72, combinedmodel$fitted.values, col = "red", lwd=2)
 

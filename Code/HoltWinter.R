@@ -14,4 +14,4 @@ fittedhwadd <- ggplot(dat.hwaddmodel, aes(x = Year, y=Revenue, col = Series)) +
                        labels = label_number(accuracy = 1))+
     xlab("Time (years)")
 fittedhwadd
-ggsave("Plots/fittedhwaddplot.png", fittedhwadd, width = 900, height = 350, units = 'px', scale = 3)
+ggsave("Final Report/Plots/fittedhwaddplot.png", fittedhwadd, width = 900, height = 350, units = 'px', scale = 3)

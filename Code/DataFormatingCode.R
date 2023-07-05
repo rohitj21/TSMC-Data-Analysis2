@@ -141,3 +141,4 @@ colnames(rev.by.platform) <- HistoricalData[1,c(1,31:36)]
 
 save(rev.by.application, rev.by.chipsize,
       rev.by.geography, rev.by.platform, timeseries ,file = "Data/TSMC.RData")
+

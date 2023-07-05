@@ -5,7 +5,7 @@ p1  <- ggplot(data=timeseries, aes(x = Time, y = Revenue))+ geom_line(linewidth 
     scale_y_continuous(trans = log10_trans(), breaks = trans_breaks("log10", function(x) 10^x),labels = label_number(accuracy = 1) )
 p1
 
-ggsave("Plots/RevenuePlot.png", plot = p1, width = 900, height = 400, units = 'px', scale = 2.5)
+ggsave("Final Report/Plots/RevenuePlot.png", plot = p1, width = 900, height = 400, units = 'px', scale = 2.5)
 
 
 dat.geography <- melt(rev.by.geography, id.vars = "Time", value.name = "Revenue Share", variable.name = "Region" )
@@ -45,5 +45,5 @@ app_plot <- ggplot(dat.application, aes(x = Time, y = 100*`Revenue Share`, fill 
 voidplot <- ggplot()+theme_void()+
     labs(title = "Scale", subtitle = "x-axis: Time (years)\ny-axis: Percentage Share in Annual Revenue")
 rev_breakdown <- grid.arrange(app_plot,geography_plot,platform_plot,voidplot, top=textGrob("Annual Revenue Breakdown"))
-ggsave("Plots/RevenueBreakdown.png",plot = rev_breakdown, height = 720, width = 1480, scale = 2.6, units = 'px')
+ggsave("Final Report/Plots/RevenueBreakdown.png",plot = rev_breakdown, height = 720, width = 1480, scale = 2.6, units = 'px')
 

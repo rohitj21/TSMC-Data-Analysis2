@@ -20,7 +20,7 @@ fittedprophet <- ggplot(dat.prophetmodel, aes(x = Year, y=Revenue, col = Series)
                        labels = label_number(accuracy = 1))+
     xlab("Time (years)")
 fittedprophet
-ggsave("Plots/fittedprophetplot.png", fittedprophet, width = 900, height = 350, units = 'px', scale = 3)
+ggsave("Final Report/Plots/fittedprophetplot.png", fittedprophet, width = 900, height = 350, units = 'px', scale = 3)
 
 
 
